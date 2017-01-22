@@ -2,84 +2,125 @@ package pacman;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Fantome extends Personnage {
-	public Fantome(int X, int Y) {
+	public String CurrentDirection = "up";
+	private int CasePreviousState;
+
+	private int CurrentX;
+	private int CurrentY;
+	
+	private int FantomeId;
+
+	public Fantome(int X, int Y,int Type) {
 		super(X, Y);
-		// TODO Auto-generated constructor stub
+		CurrentX = Map.getPosX(Type);
+		CurrentY = Map.getPosY(Type);
+		FantomeId = Type;
+		}
+
+
+	private void setCurrentDirection() {
+		int[][] m = Map.getGrille();
+		int NewX;
+		int NewY;
+		ArrayList AvailableDirections = new ArrayList();
+
+			if (m[CurrentY - 1][CurrentX] == 0 || m[CurrentY - 1][CurrentX] == 2 || m[CurrentY - 1][CurrentX] == 3) {
+				// Il peut aller en haut
+				AvailableDirections.add("up");
+			}
+			if (m[CurrentY + 1][CurrentX] == 0 || m[CurrentY + 1][CurrentX] == 2 || m[CurrentY + 1][CurrentX] == 3) {
+				// Il peut aller en bas
+				AvailableDirections.add("down");
+			}
+			if (m[CurrentY][CurrentX - 1] == 0 || m[CurrentY][CurrentX - 1] == 2 || m[CurrentY][CurrentX - 1] == 3) {
+				// Il peut aller à gauche
+				AvailableDirections.add("left");
+			}
+			if (m[CurrentY][CurrentX + 1] == 0 || m[CurrentY][CurrentX + 1] == 2 || m[CurrentY][CurrentX + 1] == 3) {
+				// Il peut aller à droite
+				AvailableDirections.add("right");
+			}
+		// Identification des directions possibles
+		
+
+		// On regarde si le fantome peut faire un pas de plus dans sa direction
+		// actuelle, si non : on détermine une nouvelle direction parmi les
+		// possibles
+		if (!AvailableDirections.contains(CurrentDirection)) {
+			// On choisit une direction au hasard parmi celles disponibles
+			int rand = (int) Math.round(Math.random() * (AvailableDirections.size() - 1)); // On
+																							// tire
+																							// un
+																							// nombre
+																							// aléatoire
+																							// entre
+																							// 0
+																							// et
+																							// le
+																							// nombre
+																							// d'entrées
+																							// dans
+																							// le
+																							// tableau,
+																							// et
+																							// on
+																							// le
+																							// récupère
+																							// en
+																							// int
+			CurrentDirection = AvailableDirections.get(rand).toString();
+		}
 	}
 
-	public static int AleatoireX(){
-		int[] tableau = {-1,0,1} ;
-		Random rand = new Random() ;
-		int posAleatoireX = tableau[rand.nextInt(tableau.length)] ;
-		
-		return posAleatoireX;
-	}
-	
-	public static int AleatoireY(){
-		int[] tableau = {-1,0,1} ;
-		Random rand = new Random() ;
-		int posAleatoireY = tableau[rand.nextInt(tableau.length)] ;
-		
-		return posAleatoireY;
-	}
-	
-	public static int[] DeplacementOK(int[] tab,int f){
-		int[][] m = Map.getGrille();
-		int x = tab[0];
-		int y = tab[1];
-		if(m[y][x]==1){
-			tab = DeplacementOK(DeplacementFantome(m,f),f);
-		}
-		return tab;
-	}
-	public static int[] DeplacementFantome(int[][] m, int f){
-		int PosX = Map.getPosX(f);
-		int PosY = Map.getPosY(f);
-		int dx = AleatoireX();
-		int dy = AleatoireY();
-		PosY=PosY+dy;
-		PosX=PosX+dx;
-		int[] tab = {PosX,PosY};
-		return tab;
-				
-	}
-	public boolean[] piece = {false,false,false,false};
+	public boolean move() {
+		setCurrentDirection();
 
-	public boolean[] Piece(int f, int x, int y){
 		int[][] m = Map.getGrille();
-		
-		if(m[y][x]==2){
-			piece[f-4]=true;
+
+		int NewX;
+		int NewY;
+
+		NewX = CurrentX;
+		NewY = CurrentY;
+
+		switch (CurrentDirection) {
+		// On redéfinit la coordonnées correspondant au déplacement
+		case "up":
+			NewY = CurrentY - 1;
+			break;
+		case "down":
+			NewY = CurrentY + 1;
+			break;
+		case "right":
+			NewX = CurrentX + 1;
+			break;
+		case "left":
+			NewX = CurrentX - 1;
+			break;
 		}
-		else{
-			piece[f-4]=false;
+
+		// On identifie une éventuelle collision avec le joueur
+		boolean Collision = false;
+		if (m[NewY][NewX] == 3) {
+			Collision = true;
 		}
-		return piece;
-	} 
-	
-	public boolean[] EtatPiece(){
-		return piece;
-	}
-	
-	public void Deplacement(){
-		int[][] m = Map.getGrille();
-		for(int f = 4;f<5;f++){ // A changer lors de l'ajout des 3 autres fantômes !!!!!!!! 
-			int [] tab = DeplacementOK(DeplacementFantome(m,f),f);
-			System.out.println(EtatPiece()[f-4]);
-			if(EtatPiece()[f-4]==true){ //La case où est le fantôme était une pièce
-				m[Map.getPosY(f)][Map.getPosX(f)]=2; 
-			}
-			else{
-				m[Map.getPosY(f)][Map.getPosX(f)]=0; 
-			}
-			Piece(f,tab[0],tab[1]);
-			m[tab[1]][tab[0]] = f;
-			
-		}
+
+		m[CurrentY][CurrentX] = CasePreviousState;
+
+		// On sauvegarde l'état de la case où on va aller pour pouvoir le
+		// réinitialiser après que le fantome l'aie quittée
+		CasePreviousState = (m[NewY][NewX] == 0 || m[NewY][NewX] == 3 ? 0 : 2); // opérateur
+																				// ternaire
+																				// powaa
+
+		m[NewY][NewX] = FantomeId;
+		CurrentX = NewX;
+		CurrentY = NewY;
+
 		Map.map = m;
+
+		return Collision;
 	}
-	
-	}
+}

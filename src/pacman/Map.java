@@ -31,7 +31,7 @@ public class Map {
 	}
 
 	public static void AfficherLabyrinthe() {
-		StdDraw.clear(StdDraw.BLACK);
+		StdDraw.picture(19.5, 25, "ground.jpg",50,50);
 		int CurrentCaseType;
 		int CurrentCoordX;
 		int CurrentCoordY;
@@ -45,32 +45,25 @@ public class Map {
 				
 				switch(CurrentCaseType){
 				case 1: //Mur
-					StdDraw.setPenColor(StdDraw.RED);
-					StdDraw.filledSquare(CurrentCoordX, CurrentCoordY, 0.4);
-					StdDraw.setPenColor(StdDraw.BLACK);
-					StdDraw.filledSquare(CurrentCoordX, CurrentCoordY, 0.3);					
+					StdDraw.picture(CurrentCoordX, CurrentCoordY,"square.png", 1, 1);				
 					break;
 				case 2: //Pièce
 					StdDraw.picture(CurrentCoordX, CurrentCoordY,"coin.png", 0.5, 0.5);				
 					break;
 				case 3: //Joueur
-					StdDraw.picture(CurrentCoordX, CurrentCoordY, Joueur.CurrentImage, 1, 1);
+					StdDraw.picture(CurrentCoordX, CurrentCoordY, Joueur.CurrentImage, 1.3, 1.3);
 					break;
 				case 4: //Fantome
-					StdDraw.setPenColor(StdDraw.GREEN);
-					StdDraw.filledCircle(CurrentCoordX, CurrentCoordY, 0.5);					
+					StdDraw.picture(CurrentCoordX, CurrentCoordY, "ghost1.png", 1.3, 1.3);				
 					break;					
 				case 5: //Fantome
-					StdDraw.setPenColor(StdDraw.PINK);
-					StdDraw.filledCircle(CurrentCoordX, CurrentCoordY, 0.5);						
+					StdDraw.picture(CurrentCoordX, CurrentCoordY, "ghost2.png", 1.3, 1.3);							
 					break;
 				case 6: //Fantome
-					StdDraw.setPenColor(StdDraw.CYAN);
-					StdDraw.filledCircle(CurrentCoordX, CurrentCoordY, 0.5);						
+					StdDraw.picture(CurrentCoordX, CurrentCoordY, "ghost3.png", 1.3, 1.3);								
 					break;
 				case 7: //Fantome
-					StdDraw.setPenColor(StdDraw.ORANGE);
-					StdDraw.filledCircle(CurrentCoordX, CurrentCoordY, 0.5);						
+					StdDraw.picture(CurrentCoordX, CurrentCoordY, "ghost4.png", 1.3, 1.3);						
 					break;
 				}
 				
@@ -84,9 +77,30 @@ public class Map {
 	public static void AfficherUI() {
 		StdDraw.setPenColor(StdDraw.WHITE);
 		StdDraw.filledRectangle(19.5, 11, 14, 3);
+		StdDraw.setPenColor(StdDraw.ORANGE);
+		StdDraw.filledRectangle(19.5, 11, 13.8, 2.8);
 		StdDraw.setPenColor(StdDraw.BLACK);
-		StdDraw.text(19.5, 11, "Score : "+Joueur.getScore());
+		StdDraw.text(19.5, 11, "Score : "+Joueur.getScore()+"   "+"Vies : "+Joueur.getLifeCount());
 		StdDraw.show();
+		if (Joueur.getLifeCount()<1){
+			StdDraw.setPenColor(StdDraw.WHITE);
+			StdDraw.filledRectangle(19.5, 30, 14, 3);
+			StdDraw.setPenColor(StdDraw.RED);
+			StdDraw.filledRectangle(19.5, 30, 13.8, 2.8);
+			StdDraw.setPenColor(StdDraw.YELLOW);
+			StdDraw.text(19.5, 30, "Game Over - appuyez sur R pour rejouer");
+			StdDraw.show();
+		}
+		if (Joueur.getScore()==239){
+			StdDraw.setPenColor(StdDraw.WHITE);
+			StdDraw.filledRectangle(19.5, 30, 14, 3);
+			StdDraw.setPenColor(StdDraw.RED);
+			StdDraw.filledRectangle(19.5, 30, 13.8, 2.8);
+			StdDraw.setPenColor(StdDraw.YELLOW);
+			StdDraw.text(19.5, 30, "Félicitation vous avez gagné !");
+			StdDraw.text(19.5, 25, "Appuyez sur R pour rejouer !");
+			StdDraw.show();
+		}
 	}
 
 	public static int[][] getGrille() {

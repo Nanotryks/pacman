@@ -1,23 +1,35 @@
 package pacman;
 
+import edu.princeton.cs.introcs.StdDraw;
+
 public class Joueur extends Personnage {
 	private static int Score = 0;
 	private String nom;
 	public String CurrentDirection;
 	public static String CurrentImage = "pacmanright.png";
-
+	private static int LifeCount = 3;
+	
+	private int CurrentX;
+	private int CurrentY;
+	private int StartX;
+	private int StartY;
+	
 	public Joueur(int X, int Y, int Score) {
 		super(X, Y);
+		
+		CurrentX = Map.getPosX(3);
+		CurrentY = Map.getPosY(3);
 
-		// Détection de l'appui d'une touche pour adapter la direction
+		StartX = CurrentX;
+		StartY = CurrentY;
 	}
 
 	public static int getScore() {
 		return Score;
 	}
 
-	public void setScore(int score) {
-		Score = score;
+	public static int getLifeCount() {
+		return LifeCount;
 	}
 
 	public void setDirection(String direction) {
@@ -46,16 +58,22 @@ public class Joueur extends Personnage {
 		this.nom = nom;
 	}
 
+	public void collisionFantome(){
+		LifeCount--;
+			//On renvoie le joueur à sa case de départ
+			int[][] m = Map.getGrille();
+			m[StartY][StartX] = 3;
+			CurrentX = StartX;
+			CurrentY = StartY;
+			Map.map = m;
+		}
+	
 	public void move() {
 		if (CurrentDirection != null) {
 			int[][] m = Map.getGrille();
-			int CurrentX;
-			int CurrentY;
 			int NewX;
 			int NewY;
 
-			CurrentX = Map.getPosX(3);
-			CurrentY = Map.getPosY(3);
 			NewX = CurrentX;
 			NewY = CurrentY;
 
@@ -83,6 +101,9 @@ public class Joueur extends Personnage {
 
 				m[CurrentY][CurrentX] = 0;
 				m[NewY][NewX] = 3;
+				
+				CurrentX = NewX;
+				CurrentY = NewY;
 			}
 
 			Map.map = m;
